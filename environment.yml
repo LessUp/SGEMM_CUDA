@@ -1,10 +1,20 @@
-name: SGEMM_CUDA
+# =============================================================================
+# conda 环境定义文件 —— 本项目的 Python 工具链依赖
+#
+# 创建环境：conda env create -f environment.yml
+# 激活环境：conda activate SGEMM_CUDA
+#
+# 注意：这个环境只服务于"基准测试 + 画图"这条分析链路
+# （gen_benchmark_results.sh / plot_benchmark_results.py / scripts/ 下的工具），
+# CUDA 工具链（nvcc、cuBLAS、nsight 等）不在这里安装，需另行单独安装。
+# =============================================================================
+name: SGEMM_CUDA        # 环境名
 channels:
-  - conda-forge
+  - conda-forge         # 从 conda-forge 源拉取（包更全、更新更及时）
 dependencies:
-  - python
-  - black
-  - cmake
-  - matplotlib
-  - seaborn
-  - tabulate
+  - python              # Python 解释器（版本不锁定，取 conda-forge 默认较新版）
+  - black               # Python 代码格式化工具（保持本项目脚本风格统一）
+  - cmake               # 构建工具：系统没装 cmake 时可以直接用这个环境里的
+  - matplotlib          # 画图库：plot_benchmark_results.py 用它画性能对比图
+  - seaborn             # 基于 matplotlib 的高级绘图库：脚本里用它画多内核折线图
+  - tabulate            # 把表格数据转成 markdown 文本：README.md 里的性能结果表靠它生成

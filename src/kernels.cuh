@@ -1,3 +1,7 @@
+// kernels.cuh —— 汇总包含全部 12 个 kernel 的实现头文件
+// 每个 kernel 是一个独立的 .cuh 文件，按优化递进顺序编号：
+//   1 naive（朴素基线） → 2 合并访问 → 3 共享内存 → 4/5 分块 →
+//   6 向量化 → 7/8 消除存储体冲突 → 9 自动调优 → 10 线程束分块 → 11/12 双缓冲
 #pragma once
 
 #include "kernels/10_kernel_warptiling.cuh"
