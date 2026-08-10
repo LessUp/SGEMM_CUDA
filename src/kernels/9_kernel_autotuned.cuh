@@ -37,9 +37,9 @@ const int K9_NUM_THREADS = 256;
  * 不同点：
  *   1. 全部尺寸参数化，可自由组合；
  *   2. 引入"线程束分块（warp tiling）"的骨架：把 BM×BN 的子块按
- *      WM=TM×16、WN=TN×16 的逻辑单位切分（WMITER=BN/BM 维上的迭代数），
- *      为 kernel 10 的 warp 级分块做准备——在默认配置下 WMITER=WNITER=1，
- *      等价于没有 warp 级切分；
+ *      WM=TM×16、WN=TN×16 的逻辑单位切分（WMITER=BM/WM，即沿 BM 维
+ *      也就是 C 的行方向要迭代的次数），为 kernel 10 的 warp 级分块
+ *      做准备——在默认配置下 WMITER=WNITER=1，等价于没有 warp 级切分；
  *   3. __launch_bounds__(256) 向编译器声明线程块规模，允许它分配更多
  *      寄存器（本 kernel 每线程要同时"活" 2×TM×TN 个 float）。
  * ============================================================================

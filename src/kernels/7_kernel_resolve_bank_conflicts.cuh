@@ -38,9 +38,12 @@
  *   - 写入：Bs[((innerColB % 2) * 4 + innerRowB * 8 + j) * 16 + innerColB / 2]
  *   - 读取：regN[i] = Bs[(dotIdx * 8 + i) * 16 + threadCol]
  * 读取时 threadCol 是地址里变化最快的下标（步长 1）：一个 warp 的 32 个
- * 线程（threadCol = threadIdx.x % 16，取值 0~15）访问 16 个连续地址，
- * 即 16 个连续 bank——冲突从 8 路降到 2 路（每个地址被两个线程命中，
- * 因为块内列方向的线程数 16 小于 warp 宽度 32）。
+ * 线程（threadCol = threadIdx.x % 16，取值 0~15）只访问 16 个连续地址，
+ * 落在 16 个不同的 bank 上；每个地址同时被 warp 内的两个线程读取
+ * （线程号相差 16 的线程 threadCol 相同）。访问同一地址属于"广播"，
+ * 硬件一个周期即可服务完整个线程束，不产生冲突——严格地说冲突从
+ * 8 路降到 0。若按"每个 bank 被多少线程命中"的简化口径统计，则会
+ * 显示为 2 路（与 scripts/bank_calc.py 的统计方式一致）。
  *
  * 代价
  * ----
@@ -114,7 +117,7 @@ __global__ void sgemmResolveBankConflicts(int M, int N, int K, float alpha,
         regM[i] = As[dotIdx * BM + threadRow * TM + i];
       }
       // 读取 Bs：地址的末位下标是 threadCol（步长 1），
-      // warp 内 32 个线程落在 16 个连续 bank 上，冲突仅为 2 路
+      // warp 内 32 个线程只访问 16 个连续 bank 的地址，同地址是广播无冲突
       for (uint i = 0; i < TN; ++i) {
         regN[i] = Bs[(dotIdx * 8 + i) * 16 + threadCol];
       }
